@@ -1,79 +1,79 @@
 #include <ESP8266WiFi.h>
 #include "esp_network.h"
 #include "esp_config.h"
-#include "esp_fy6800.h"
+
+#ifdef AWG_TYPE_JDS6600
+  #include "esp_awg_jds6600.h"
+#endif
+#ifdef AWG_TYPE_FY6800
+  #include "esp_awg_fy6800.h"
+#endif
 
 WiFiServer rpc_server(RPC_PORT);
 WiFiServer lxi_server(LXI_PORT);
 
-void setup() {
+void setup()
+{
+  Serial.begin(115200);
 
-    Serial.begin(115200);
-
-    // We start by connecting to a WiFi network
-    DEBUG("Connecting to ");
-    DEBUG(WIFI_SSID);
+  // We start by connecting to a WiFi network
+  DEBUG("Connecting to ");
+  DEBUG(WIFI_SSID);
 
 #if defined(STATIC_IP)
-    IPAddress ip(ESP_IP);
-    IPAddress mask(ESP_MASK);
-    IPAddress gateway(ESP_GW);
-    WiFi.config(ip, gateway, mask);
+  IPAddress ip(ESP_IP);
+  IPAddress mask(ESP_MASK);
+  IPAddress gateway(ESP_GW);
+  WiFi.config(ip, gateway, mask);
 #endif
 
 #if defined(WIFI_MODE_CLIENT)
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(WIFI_SSID, WIFI_PSK);
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(WIFI_SSID, WIFI_PSK);
 #elif defined(WIFI_MODE_AP)
-    WiFi.softAP(WIFI_SSID, WIFI_PSK);
+  WiFi.softAP(WIFI_SSID, WIFI_PSK);
 #else
-    #error PLEASE SELECT WIFI_MODE_AP OR WIFI_MODE_CLIENT!
+  #error PLEASE SELECT WIFI_MODE_AP OR WIFI_MODE_CLIENT!
 #endif
 
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        DEBUG(".");
-    }
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    DEBUG(".");
+  }
 
-    DEBUG("WiFi connected");
-    DEBUG("IP address: ");
-    DEBUG(WiFi.localIP());
+  DEBUG("WiFi connected");
+  DEBUG("IP address: ");
+  DEBUG(WiFi.localIP());
 
-    rpc_server.begin();
-    lxi_server.begin();
+  rpc_server.begin();
+  lxi_server.begin();
 }
 
-void loop() {
-    WiFiClient rpc_client;
-    WiFiClient lxi_client;
+void loop()
+{
+  WiFiClient rpc_client;
+  WiFiClient lxi_client;
 
-    lxi_client.setTimeout(1000);
+  lxi_client.setTimeout(1000);
 
-    do
-    {
-        rpc_client = rpc_server.available();
+  do {
+    rpc_client = rpc_server.available();
+  } while(!rpc_client);
+  DEBUG("RPC CONNECTION.");
+
+  handlePacket(rpc_client);
+  rpc_client.stop();
+
+  do {
+    lxi_client = lxi_server.available();
+  } while(!lxi_client);
+  DEBUG("LXI CONNECTION.");
+
+  while(1) {
+    if(0 != handlePacket(lxi_client)) {
+      lxi_client.stop();
+      DEBUG("RESTARTING");
+      return;
     }
-    while(!rpc_client);
-    DEBUG("RPC CONNECTION.");
-
-    handlePacket(rpc_client);
-    rpc_client.stop();
-
-    do
-    {
-        lxi_client = lxi_server.available();
-    }
-    while(!lxi_client);
-    DEBUG("LXI CONNECTION.");
-
-    while(1)
-    {
-        if(0 != handlePacket(lxi_client))
-        {
-            lxi_client.stop();
-            DEBUG("RESTARTING");
-            return;
-        }
-    }
+  }
 }
-

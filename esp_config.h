@@ -1,6 +1,10 @@
 #ifndef _ESP_CONFIG_H_
 #define _ESP_CONFIG_H_
 
+/* Choose AWG type */
+#define AWG_TYPE_JDS6600
+//#define AWG_TYPE_FY6800
+
 /* Select either AP or CLIENT mode:
     - AP - creates new network that oscilloscope can connect to
     - CLIENT - joins existing network
@@ -9,8 +13,8 @@
 //#define WIFI_MODE_CLIENT
 
 /* WiFi credentials */
-#define WIFI_SSID             "wlan_ssid"
-#define WIFI_PSK              "wlan_key"
+#define WIFI_SSID             "awg_wan"
+#define WIFI_PSK              "awg1234"
 
 /* Comment this for DHCP. However you'll need to obtain IP somehow. */
 #define STATIC_IP
@@ -44,7 +48,7 @@
 
 //#define DEBUG_PRINTS
 #ifdef DEBUG_PRINTS
-  #define DEBUG(TEXT)         Serial.println(TEXT);
+  #define DEBUG(TEXT)       Serial.println(TEXT);
 #else
   #define DEBUG(TEXT)
 #endif
