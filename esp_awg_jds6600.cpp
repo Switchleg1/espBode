@@ -36,61 +36,64 @@ void espAWGJDS6600::setCh2Output(uint32_t output)
 /* Set frequency in Hz */
 void espAWGJDS6600::setCh1Freq(uint32_t frequency)
 {
-    char command[64];
-    snprintf(command, 64, ":w23=%lu,0.\r\n", frequency);
-    gDeviceState.ch1Freq = frequency;
-    writeData(command, strlen(command));
+  char command[64];
+  snprintf(command, 64, ":w23=%lu,0.\r\n", frequency);
+  gDeviceState.ch1Freq = frequency;
+  writeData(command, strlen(command));
 }
 
 /* Set frequency in Hz */
 void espAWGJDS6600::setCh2Freq(uint32_t frequency)
 {
-    char command[64];
-    snprintf(command, 64, ":w24=%lu,0.\r\n", frequency);
-    gDeviceState.ch1Freq = frequency;
-    writeData(command, strlen(command));
+  char command[64];
+  snprintf(command, 64, ":w24=%lu,0.\r\n", frequency);
+  gDeviceState.ch1Freq = frequency;
+  writeData(command, strlen(command));
 }
 
 /* Ampl is in mV: 12.345V = 12345 */
 void espAWGJDS6600::setCh1Ampl(uint32_t ampl)
 {
-    char command[64];
-    snprintf(command, 64, ":w25=%lu.\r\n", ampl);
-    gDeviceState.ch1Ampl = ampl;
-    writeData(command, strlen(command));
+  char command[64];
+  snprintf(command, 64, ":w25=%lu.\r\n", ampl);
+  gDeviceState.ch1Ampl = ampl;
+  writeData(command, strlen(command));
 }
 
 void espAWGJDS6600::setCh2Ampl(uint32_t ampl)
 {
-    char command[64];
-    snprintf(command, 64, ":w26=%lu.\r\n", ampl);
-    gDeviceState.ch2Ampl = ampl;
-    writeData(command, strlen(command));
+  char command[64];
+  snprintf(command, 64, ":w26=%lu.\r\n", ampl);
+  gDeviceState.ch2Ampl = ampl;
+  writeData(command, strlen(command));
 }
 
 /* Phase is in 0.1deg: 12.5deg = 125 */
 void espAWGJDS6600::setCh1Phase(uint32_t phase)
 {
-    char command[64];
-    snprintf(command, 64, ":w31=%lu.\r\n", phase/1000);
-    gDeviceState.ch2Phase = phase;
-    writeData(command, strlen(command));
+  char command[64];
+  snprintf(command, 64, ":w31=%lu.\r\n", phase / 100);
+  gDeviceState.ch2Phase = phase;
+  writeData(command, strlen(command));
 }
 
 void espAWGJDS6600::setCh2Phase(uint32_t phase)
 {
-    char command[64];
-    snprintf(command, 64, ":w31=%lu.\r\n", phase/1000);
-    gDeviceState.ch2Phase = phase;
-    writeData(command, strlen(command));
+  char command[64];
+  snprintf(command, 64, ":w31=%lu.\r\n", phase / 100);
+  gDeviceState.ch2Phase = phase;
+  writeData(command, strlen(command));
 }
 
 void espAWGJDS6600::setCh1Offset(int32_t offset)
 {
-    char command[64];
-    snprintf(command, 64, ":w27=%l.\r\n", offset / 10 + 1000);
-    gDeviceState.ch2Offset = offset;
-    writeData(command, strlen(command));
+  if(offset > 9999) offset = 9999;
+  if(offset < -9999) offset = -9999;
+  
+  char command[64];
+  snprintf(command, 64, ":w27=%l.\r\n", offset / 10 + 1000);
+  gDeviceState.ch1Offset = offset;
+  writeData(command, strlen(command));
 }
 
 void espAWGJDS6600::setCh2Offset(int32_t offset)

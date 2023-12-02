@@ -102,20 +102,20 @@ uint32_t receiveRpcPacket(uint8_t **data, WiFiClient client)
     /* Length of the whole packet is stored in the RPC header */
     length = (header.frag & 0x7FFFFFFF) + 4;
     *data = (uint8_t*)malloc(length);
-
+  
     /* Copy the header */
     memcpy((rpcreq_header*)*data, &header, sizeof(rpcreq_header));
-
+  
     /* Receive remaining data (length - header) */
     while(!client.available());
     client.readBytes(*data + sizeof(rpcreq_header), length - sizeof(rpcreq_header));
     swapEndianess((uint8_t*)(*data + sizeof(rpcreq_header)), length - sizeof(rpcreq_header));
-
+  
     return length;
   }
   else {
-      *data = NULL;
-      return 0;
+    *data = NULL;
+    return 0;
   }
 }
 
@@ -147,15 +147,14 @@ uint8_t handlePortmap(uint8_t *packet, WiFiClient client)
   rpcreq_getport *getport = (rpcreq_getport*)packet;
 
   if(getport->header.procedure != PORTMAP_GETPORT) {
-      DEBUG("ERROR: UNKNOWN RPC PACKET");
-  }
-  else {
-      rpcresp_getport response;
-      fillResponseHeader((uint8_t*)&(response.header), getport->header.xid, sizeof(rpcresp_getport));
-      response.vxi_port = LXI_PORT;
-      swapEndianess((uint8_t*)&response, sizeof(rpcresp_getport));
-      while(!client.availableForWrite());
-      client.write((uint8_t*)&response, sizeof(rpcresp_getport));
+    DEBUG("ERROR: UNKNOWN RPC PACKET");
+  } else {
+    rpcresp_getport response;
+    fillResponseHeader((uint8_t*)&(response.header), getport->header.xid, sizeof(rpcresp_getport));
+    response.vxi_port = LXI_PORT;
+    swapEndianess((uint8_t*)&response, sizeof(rpcresp_getport));
+    while(!client.availableForWrite());
+    client.write((uint8_t*)&response, sizeof(rpcresp_getport));
   }
   
   return 0;

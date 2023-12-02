@@ -1,5 +1,5 @@
 # espBode
-Interface between a Siglent oscilloscope and FY6800 AWG
+Interface between a Siglent oscilloscope and FY6800 / JDS6600 AWG
 
 The idea bases on solution proposed by 4x1md in https://github.com/4x1md/sds1004x_bode
 
@@ -11,11 +11,6 @@ TODO:
  - rewrite whole thing to C++, so adding new AWGs would be easier
  - add possibility to configure SSID/PSK + IP without flashing the new SW
 
-**!WARNING! FY6800 VCC level is 5V, so it has to be dropped somehow to 3.3V ESP may release the magic smoke otherwise.**
+**!WARNING! TTL is 5V, connect to esp VIN or provide your own LDO**
 
 ![image test](img/connection.png)
-
-In my configuration I've just used a yellow LED, that dropped the voltage by ~2V.
-ESP consumes about 70mA, that's probably too much for a LED, but maybe it'll survive.
-
-![image LED](img/espLed.jpg)
