@@ -1,7 +1,7 @@
 #ifndef _ESP_AWG_H_
 #define _ESP_AWG_H_
 
-#include <ESP8266WiFi.h>
+#include <arduino.h>
 
 typedef enum {
     EWaveType_Sine          = 0,

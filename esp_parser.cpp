@@ -1,3 +1,21 @@
+#if defined(ESP8266)
+  #include <ESP8266WiFi.h>
+#elif defined(ESP32)
+  #include <WiFi.h>
+#else
+  #error PLEASE SELECT ESP32 or ESP8266
+#endif
+
+#include "esp_config.h"
+#ifdef AWG_TYPE_JDS6600
+  #include "esp_awg_jds6600.h"
+  espAWGJDS6600 awg;
+#endif
+#ifdef AWG_TYPE_FY6800
+  #include "esp_awg_fy6800.h"
+  espAWGFY6800 awg;
+#endif
+
 #include "esp_parser.h"
 
 volatile char *gReadBuffer = NULL;

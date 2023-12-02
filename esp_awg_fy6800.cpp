@@ -1,11 +1,6 @@
 #include "esp_awg_fy6800.h"
 #include <string.h>
 
-#include "esp_config.h"
-#ifdef AWG_TYPE_FY6800
-  espAWGFY6800 awg;
-#endif
-
 void espAWGFY6800::setCh1Wave(EWaveType wave)
 {
     char command[] = "WMW00\n";

@@ -1,7 +1,6 @@
 #ifndef _ESP_FY6800_H_
 #define _ESP_FY6800_H_
 
-#include <ESP8266WiFi.h>
 #include "esp_awg.h"
 
 class espAWGFY6800: public espAWG {
@@ -29,7 +28,5 @@ class espAWGFY6800: public espAWG {
     void setCh1Offset(int32_t offset);
     void setCh2Offset(int32_t offset);
 };
-
-extern espAWGFY6800 awg; 
 
 #endif _ESP_FY6800_H_

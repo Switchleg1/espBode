@@ -1,11 +1,6 @@
 #include "esp_awg_jds6600.h"
 #include <string.h>
 
-#include "esp_config.h"
-#ifdef AWG_TYPE_JDS6600
-  espAWGJDS6600 awg;
-#endif
-
 void espAWGJDS6600::setCh1Wave(EWaveType wave)
 {
   char command[13];

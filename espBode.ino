@@ -1,7 +1,13 @@
-#include <ESP8266WiFi.h>
+#if defined(ESP8266)
+  #include <ESP8266WiFi.h>
+#elif defined(ESP32)
+  #include <WiFi.h>
+#else
+  #error PLEASE SELECT ESP32 or ESP8266
+#endif
+
 #include "esp_network.h"
 #include "esp_config.h"
-
 #ifdef AWG_TYPE_JDS6600
   #include "esp_awg_jds6600.h"
 #endif
@@ -15,6 +21,10 @@ WiFiServer lxi_server(LXI_PORT);
 void setup()
 {
   Serial.begin(115200);
+
+#if defined(ESP32)
+  Serial2.begin(115200);
+#endif
 
   // We start by connecting to a WiFi network
   DEBUG("Connecting to ");

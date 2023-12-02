@@ -13,8 +13,8 @@
 //#define WIFI_MODE_CLIENT
 
 /* WiFi credentials */
-#define WIFI_SSID             "awg_wan"
-#define WIFI_PSK              "awg1234"
+#define WIFI_SSID             "AWG-LAN"
+#define WIFI_PSK              "awg12345"
 
 /* Comment this for DHCP. However you'll need to obtain IP somehow. */
 #define STATIC_IP
@@ -47,7 +47,7 @@
 #define RX_BUFF_SIZE        (128)
 
 //#define DEBUG_PRINTS
-#ifdef DEBUG_PRINTS
+#if defined(DEBUG_PRINTS) || defined(ESP32)
   #define DEBUG(TEXT)       Serial.println(TEXT);
 #else
   #define DEBUG(TEXT)

@@ -1,7 +1,6 @@
 #ifndef _ESP_JDS6600_H_
 #define _ESP_JDS6600_H_
 
-#include <ESP8266WiFi.h>
 #include "esp_awg.h"
 
 class espAWGJDS6600: public espAWG {
@@ -29,7 +28,5 @@ class espAWGJDS6600: public espAWG {
     void setCh1Offset(int32_t offset);
     void setCh2Offset(int32_t offset);
 };
-
-extern espAWGJDS6600 awg; 
 
 #endif _ESP_JDS6600_H_
