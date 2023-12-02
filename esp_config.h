@@ -4,6 +4,7 @@
 /* Choose AWG type */
 #define AWG_TYPE_JDS6600
 //#define AWG_TYPE_FY6800
+//#define AWG_TYPE_FY6900
 
 /* Select either AP or CLIENT mode:
     - AP - creates new network that oscilloscope can connect to

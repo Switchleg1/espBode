@@ -15,6 +15,10 @@
   #include "esp_awg_fy6800.h"
   espAWGFY6800 awg;
 #endif
+#ifdef AWG_TYPE_FY6900
+  #include "esp_awg_fy6900.h"
+  espAWGFY6900 awg;
+#endif
 
 #include "esp_parser.h"
 

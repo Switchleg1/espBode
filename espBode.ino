@@ -8,12 +8,6 @@
 
 #include "esp_network.h"
 #include "esp_config.h"
-#ifdef AWG_TYPE_JDS6600
-  #include "esp_awg_jds6600.h"
-#endif
-#ifdef AWG_TYPE_FY6800
-  #include "esp_awg_fy6800.h"
-#endif
 
 WiFiServer rpc_server(RPC_PORT);
 WiFiServer lxi_server(LXI_PORT);

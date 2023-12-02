@@ -1,7 +1,7 @@
 #include "esp_awg_jds6600.h"
 #include <string.h>
 
-void espAWGJDS6600::setCh1Wave(EWaveType wave)
+void espAWGJDS6600::setCh1Wave(uint8_t wave)
 {
   char command[13];
   snprintf(command, 13, ":w21=%01u.\r\n", wave);
@@ -9,7 +9,7 @@ void espAWGJDS6600::setCh1Wave(EWaveType wave)
   writeData(command, 12);
 }
 
-void espAWGJDS6600::setCh2Wave(EWaveType wave)
+void espAWGJDS6600::setCh2Wave(uint8_t wave)
 {
   char command[13];
   snprintf(command, 13, ":w21=%01u.\r\n", wave);
