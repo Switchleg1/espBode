@@ -1,5 +1,5 @@
 # espBode
-Interface between a Siglent oscilloscope and FY6800 / JDS6600 AWG
+Interface between a Siglent oscilloscope and FY6800 / FY6900 / JDS6600 AWG using esp8266 / esp32
 
 The idea bases on solution proposed by 4x1md in https://github.com/4x1md/sds1004x_bode
 
