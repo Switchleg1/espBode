@@ -1,7 +1,9 @@
 #ifndef _ESP_AWG_H_
 #define _ESP_AWG_H_
 
-#include <arduino.h>
+#include "esp_config.h"
+
+#define CMD_LEN 128
 
 typedef struct {
     uint8_t     ch1Output;
@@ -44,9 +46,10 @@ class espAWG {
     virtual void setCh2Offset(int32_t offset);
 
   protected:
-    void writeData(const char* data, uint8_t len);
+    void          writeData();
 
-    SDeviceState gDeviceState;
+    SDeviceState  gDeviceState;
+    char          command[CMD_LEN];
 };
 
 #endif _ESP_AWG_H_

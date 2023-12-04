@@ -2,7 +2,6 @@
 #define _ESP_FY6900_H_
 
 #include "esp_awg.h"
-#include "esp_config.h"
 
 #ifdef AWG_TYPE_FY6900
 typedef enum {

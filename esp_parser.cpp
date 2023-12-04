@@ -1,11 +1,3 @@
-#if defined(ESP8266)
-  #include <ESP8266WiFi.h>
-#elif defined(ESP32)
-  #include <WiFi.h>
-#else
-  #error PLEASE SELECT ESP32 or ESP8266
-#endif
-
 #include "esp_config.h"
 #ifdef AWG_TYPE_JDS6600
   #include "esp_awg_jds6600.h"
@@ -103,7 +95,7 @@ void handleWriteMsg(char *msg, uint8_t len)
     if(0 == strncmp(msg, "PHSE,", 5)) {
       msg+=5;
       len-=5;
-      selectedChannel==1 ? awg.setCh1Phase(parseNumber(msg)) : awg.setCh2Phase(parseNumber(msg));
+      selectedChannel==1 ? awg.setCh1Phase(parseDecimal(msg)) : awg.setCh2Phase(parseDecimal(msg));
     }
 
     if(0 == strncmp(msg, "FRQ,", 4)) {

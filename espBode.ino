@@ -1,16 +1,22 @@
-#if defined(ESP8266)
-  #include <ESP8266WiFi.h>
-#elif defined(ESP32)
-  #include <WiFi.h>
-#else
-  #error PLEASE SELECT ESP32 or ESP8266
-#endif
-
-#include "esp_network.h"
 #include "esp_config.h"
+#include "esp_parser.h"
+#include "esp_network.h"
 
-WiFiServer rpc_server(RPC_PORT);
-WiFiServer lxi_server(LXI_PORT);
+typedef enum {
+  ESP_WIFI,
+  ESP_RPC,
+  ESP_LXI
+} espState;
+
+WiFiServer  rpcServer(RPC_PORT);
+WiFiServer  lxiServer(LXI_PORT);
+
+espState    currentState  = ESP_WIFI;
+uint8_t     wifiTimeout   = 0;
+
+#if defined(DEBUG_TELNET) && !defined(DEBUG_UART) && !defined(ESP32)
+  ESPTelnet telnet;
+#endif
 
 void setup()
 {
@@ -39,45 +45,90 @@ void setup()
 #else
   #error PLEASE SELECT WIFI_MODE_AP OR WIFI_MODE_CLIENT!
 #endif
-
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    DEBUG(".");
-  }
-
-  DEBUG("WiFi connected");
-  DEBUG("IP address: ");
-  DEBUG(WiFi.localIP());
-
-  rpc_server.begin();
-  lxi_server.begin();
 }
 
 void loop()
 {
-  WiFiClient rpc_client;
-  WiFiClient lxi_client;
+  //check wifi connection
+  if(WiFi.status() != WL_CONNECTED) {
+#if defined(DEBUG_TELNET) && !defined(DEBUG_UART) && !defined(ESP32)
+    telnet.stop();
+#endif
+    rpcServer.stop();
+    lxiServer.stop();
+    currentState = ESP_WIFI;
 
-  lxi_client.setTimeout(1000);
+#if defined(WIFI_MODE_CLIENT)
+    if(wifiTimeout++ > 10) {
+      wifiTimeout = 0;
 
-  do {
-    rpc_client = rpc_server.available();
-  } while(!rpc_client);
-  DEBUG("RPC CONNECTION.");
+      DEBUG("WiFi Reconnecting");
+      WiFi.disconnect();
+      WiFi.begin(WIFI_SSID, WIFI_PSK);
+    }
+#endif
+    
+    delay(500);
+    DEBUG(".");
+    return;
+  }
 
-  handlePacket(rpc_client);
-  rpc_client.stop();
+  //new wifi connection
+  if(currentState == ESP_WIFI) {
+    currentState  = ESP_RPC;
+    wifiTimeout   = 10;
+    
+    DEBUG("WiFi connected");
+    DEBUG("IP address: ");
+    DEBUG(WiFi.localIP());
+  
+    rpcServer.begin();
+    lxiServer.begin();
 
-  do {
-    lxi_client = lxi_server.available();
-  } while(!lxi_client);
-  DEBUG("LXI CONNECTION.");
+#if defined(DEBUG_TELNET) && !defined(DEBUG_UART) && !defined(ESP32)
+    telnet.begin();
+#endif
+  }
 
-  while(1) {
-    if(0 != handlePacket(lxi_client)) {
-      lxi_client.stop();
-      DEBUG("RESTARTING");
-      return;
+#if defined(DEBUG_TELNET) && !defined(DEBUG_UART) && !defined(ESP32)
+  //check telnet connection
+  telnet.loop();
+#endif
+
+  //check for rpc client
+  if(currentState == ESP_RPC) {
+    WiFiClient  rpcClient;
+    rpcClient = rpcServer.available();
+    if(rpcClient) {
+      DEBUG("RPC CONNECTION.");
+  
+      handlePacket(rpcClient);
+      rpcClient.stop();
+
+      currentState = ESP_LXI;
+    }
+  }
+
+  //check for lxi client
+  if(currentState == ESP_LXI) {
+    WiFiClient  lxiClient;
+    lxiClient.setTimeout(1000);
+    lxiClient = lxiServer.available();
+    if(lxiClient) {
+      DEBUG("LXI CONNECTION.");
+  
+      //handle lxi connection
+      while(!handlePacket(lxiClient)) {
+#if defined(DEBUG_TELNET) && !defined(DEBUG_UART) && !defined(ESP32)
+        telnet.loop();
+#endif
+        yield();
+      }
+  
+      lxiClient.stop();
+      DEBUG("DISCONNECTING");
+
+      currentState = ESP_RPC;
     }
   }
 }

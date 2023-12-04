@@ -1,7 +1,19 @@
 #ifndef _ESP_PARSER_H_
 #define _ESP_PARSER_H_
 
-#include <arduino.h>
+#include "esp_config.h"
+#ifdef AWG_TYPE_JDS6600
+  #include "esp_awg_jds6600.h"
+  extern espAWGJDS6600 awg;
+#endif
+#ifdef AWG_TYPE_FY6800
+  #include "esp_awg_fy6800.h"
+  extern espAWGFY6800 awg;
+#endif
+#ifdef AWG_TYPE_FY6900
+  #include "esp_awg_fy6900.h"
+  extern espAWGFY6900 awg;
+#endif
 
 extern volatile char *gReadBuffer;
 

@@ -1,6 +1,14 @@
 #ifndef _ESP_CONFIG_H_
 #define _ESP_CONFIG_H_
 
+#if defined(ESP8266)
+  #include <ESP8266WiFi.h>
+#elif defined(ESP32)
+  #include <WiFi.h>
+#else
+  #error PLEASE SELECT ESP32 or ESP8266
+#endif
+
 /* Choose AWG type */
 #define AWG_TYPE_JDS6600
 //#define AWG_TYPE_FY6800
@@ -10,21 +18,21 @@
     - AP - creates new network that oscilloscope can connect to
     - CLIENT - joins existing network
     */
-#define WIFI_MODE_AP
-//#define WIFI_MODE_CLIENT
+//#define WIFI_MODE_AP
+#define WIFI_MODE_CLIENT
 
 /* WiFi credentials */
-#define WIFI_SSID             "AWG-LAN"
-#define WIFI_PSK              "awg12345"
+#define WIFI_SSID             "phatnet"
+#define WIFI_PSK              "QwedcxzA!"
 
 /* Comment this for DHCP. However you'll need to obtain IP somehow. */
 #define STATIC_IP
 
 /* Static ip configuration */
 #ifdef STATIC_IP
-  #define ESP_IP              192,168,1,6
+  #define ESP_IP              192,168,0,69
   #define ESP_MASK            255,255,255,0
-  #define ESP_GW              192,168,1,1
+  #define ESP_GW              192,168,0,1
 #endif
 
 #define ID                  "IDN-SGLT-PRI SDG1062X\n"
@@ -47,9 +55,16 @@
 
 #define RX_BUFF_SIZE        (128)
 
-//#define DEBUG_PRINTS
-#if defined(DEBUG_PRINTS) || defined(ESP32)
+
+//DEBUG SETTINGS
+//#define DEBUG_UART
+#define DEBUG_TELNET        //required ESP Telnet library
+#if defined(DEBUG_UART) || defined(ESP32)
   #define DEBUG(TEXT)       Serial.println(TEXT);
+#elif defined(DEBUG_TELNET)
+  #include "ESPTelnet.h"
+  extern ESPTelnet telnet;
+  #define DEBUG(TEXT)       telnet.println(TEXT); telnet.loop();
 #else
   #define DEBUG(TEXT)
 #endif

@@ -1,11 +1,3 @@
-#if defined(ESP8266)
-  #include <ESP8266WiFi.h>
-#elif defined(ESP32)
-  #include <WiFi.h>
-#else
-  #error PLEASE SELECT ESP32 or ESP8266
-#endif
-
 #include "esp_network.h"
 #include "esp_config.h"
 #include "esp_parser.h"
@@ -199,6 +191,7 @@ uint8_t handleVxi11(uint8_t *packet, WiFiClient client)
     DEBUG("DEV_READ");
     /* Answer with rcpresp_devReadWrite packet for DEV_READ */
     sendReadResponse(header->xid, client);
+    return 0;
     break;
 
   case VXI_11_DEV_WRITE:

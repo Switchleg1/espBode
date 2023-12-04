@@ -1,6 +1,8 @@
 #ifndef _ESP_NETWORK_H_
 #define _ESP_NETWORK_H_
 
+#include "esp_config.h"
+
 typedef struct {
   uint32_t   frag;
   uint32_t   xid;

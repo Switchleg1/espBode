@@ -1,6 +1,8 @@
 #include "esp_awg.h"
 #include <string.h>
 
+#include "esp_config.h"
+
 void espAWG::setCh1Wave(uint8_t wave)
 {
   gDeviceState.ch1Wave = wave;
@@ -66,24 +68,49 @@ void espAWG::setCh2Offset(int32_t offset)
   gDeviceState.ch2Offset = offset;
 }
 
-void espAWG::writeData(const char* data, uint8_t len)
+void espAWG::writeData()
 {
-  uint32_t timeout = 0;
-  Serial.write((uint8_t*)data, len);
-  
-#if defined(ESP32)
-  Serial2.write((uint8_t*)data, len);
-  while(0 == Serial2.available()) {
-#else
-  while(0 == Serial.available()) {
-#endif
-    delay(1);
-    if(timeout++>1000) return;
-  }
+  //send command to awg
+  Serial.write((uint8_t*)command, strlen(command));
 
+  //echo via serial esp32
 #if defined(ESP32)
-  Serial2.read();
-#else
-  Serial.read();
+  Serial2.write((uint8_t*)command, strlen(command));
 #endif
+
+  //echo via telnet
+#if defined(DEBUG_TELNET) && !defined(DEBUG_UART) && !defined(ESP32)
+  telnet.print(command);
+#endif
+
+  //get response
+  uint16_t  timeout = 0;
+  char      responseString[256] = {0,};
+  uint8_t   responsePos = 0;
+  while(timeout++ < 5000) {
+#if defined(ESP32)
+    if(Serial2.available() > 0) {
+      char c = Serial2.read();
+#else
+    if(Serial.available() > 0) {
+      char c = Serial.read();
+#endif
+      if(c == '\n') {
+        responseString[responsePos++] = 0;
+        timeout = 0xFFFF;
+        break;
+      } else {
+        responseString[responsePos++] = c;
+      }
+    }
+    delay(1);
+  }
+  responseString[responsePos] = 0;
+
+  //write response
+  DEBUG(responseString);
+
+  if(timeout != 0xFFFF) {
+    DEBUG("TIMEOUT");
+  }
 }
