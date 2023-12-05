@@ -87,7 +87,7 @@ void espAWG::writeData()
   uint16_t  timeout = 0;
   char      responseString[256] = {0,};
   uint8_t   responsePos = 0;
-  while(timeout++ < 5000) {
+  while(timeout++ < 1000) {
 #if defined(ESP32)
     if(Serial2.available() > 0) {
       char c = Serial2.read();

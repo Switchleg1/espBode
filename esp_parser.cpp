@@ -32,24 +32,32 @@ static uint32_t parseNumber(char *msg)
 Return value is multiplied *1000 to include the decimal part:
     123.345 -> 123456
     -1.2    ->  -1200 */
-static int32_t parseDecimal(char *msg)
+static int32_t parseDecimal(char *msg, uint8_t dec_count = 3)
 {
   uint8_t dot = 0;
-  int32_t multiplier = 1000;
   int32_t number = 0;
+
+  int32_t multiplier = 1;
+  for(uint8_t i = 0; i < dec_count; i++) {
+    multiplier *= 10;
+  }
 
   if(msg[0] == '-') {
     multiplier*=-1;
     msg++;
   }
 
-  while((0<=(msg[0]-'0') && (msg[0]-'0')<=9) || msg[0] == '.') {
+  while(((0<=(msg[0]-'0') && (msg[0]-'0')<=9) || msg[0] == '.') && dot < (dec_count+1)) {
     if(msg[0] == '.') {
+      if(dot) break;
       dot = 1;
       msg++;
       continue;
     }
-    if(dot) multiplier/=10;
+    if(dot) {
+      multiplier/=10;
+      dot++;
+    }
     number*=10;
     number+=msg[0]-'0';
     msg++;
@@ -59,6 +67,15 @@ static int32_t parseDecimal(char *msg)
 
 void handleWriteMsg(char *msg, uint8_t len)
 {
+  //write line to terminal
+  char msgString[256];
+  for(uint8_t i=0; i<len; i++) {
+    if(msg[i] == '\n') msgString[i] = 0;
+    else msgString[i] = msg[i];
+  }
+  msgString[len] = 0;
+  DEBUG(msgString);
+  
   uint8_t selectedChannel = 1;
   while(len>0) {
     /* ID request message, we preapare answer in gReadBuffer */
@@ -101,7 +118,7 @@ void handleWriteMsg(char *msg, uint8_t len)
     if(0 == strncmp(msg, "FRQ,", 4)) {
       msg+=4;
       len-=4;
-      selectedChannel==1 ? awg.setCh1Freq(parseNumber(msg)) : awg.setCh2Freq(parseNumber(msg));
+      selectedChannel==1 ? awg.setCh1Freq(parseDecimal(msg, 2)) : awg.setCh2Freq(parseDecimal(msg, 2));
     }
 
     if(0 == strncmp(msg, "AMP,", 4)) {

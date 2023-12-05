@@ -38,7 +38,7 @@ void espAWGFY6800::setCh1Freq(uint32_t frequency)
 {
   espAWG::setCh1Freq(frequency);
 
-  snprintf(command, CMD_LEN, "WMF%08lu000000\n", frequency);
+  snprintf(command, CMD_LEN, "WMF%010u0000\n", frequency);
   writeData();
 }
 
@@ -47,7 +47,7 @@ void espAWGFY6800::setCh2Freq(uint32_t frequency)
 {
   espAWG::setCh2Freq(frequency);
   
-  snprintf(command, CMD_LEN, "WFF%08lu000000\n", frequency);
+  snprintf(command, CMD_LEN, "WFF%010u0000\n", frequency);
   writeData();
 }
 

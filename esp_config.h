@@ -12,7 +12,6 @@
 /* Choose AWG type */
 #define AWG_TYPE_JDS6600
 //#define AWG_TYPE_FY6800
-//#define AWG_TYPE_FY6900
 
 /* Select either AP or CLIENT mode:
     - AP - creates new network that oscilloscope can connect to
@@ -55,10 +54,9 @@
 
 #define RX_BUFF_SIZE        (128)
 
-
 //DEBUG SETTINGS
 //#define DEBUG_UART
-#define DEBUG_TELNET        //required ESP Telnet library
+//#define DEBUG_TELNET        //required ESP Telnet library
 #if defined(DEBUG_UART) || defined(ESP32)
   #define DEBUG(TEXT)       Serial.println(TEXT);
 #elif defined(DEBUG_TELNET)

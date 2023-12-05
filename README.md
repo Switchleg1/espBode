@@ -13,4 +13,5 @@ TODO:
 
 **!WARNING! TTL is 5V, connect to esp VIN or provide your own LDO**
 
-![image test](img/connection.png)
+![connection](img/connection.png)
+![bode plot](img/bode.png)

@@ -38,7 +38,7 @@ void espAWGJDS6600::setCh1Freq(uint32_t frequency)
 {
   espAWG::setCh1Freq(frequency);
   
-  snprintf(command, CMD_LEN, ":w23=%lu,0.\r\n", frequency * 100);
+  snprintf(command, CMD_LEN, ":w23=%u,0.\r\n", frequency);
   writeData();
 }
 
@@ -47,7 +47,7 @@ void espAWGJDS6600::setCh2Freq(uint32_t frequency)
 {
   espAWG::setCh2Freq(frequency);
   
-  snprintf(command, CMD_LEN, ":w24=%lu,0.\r\n", frequency * 100);
+  snprintf(command, CMD_LEN, ":w24=%u,0.\r\n", frequency);
   writeData();
 }
 
@@ -56,7 +56,7 @@ void espAWGJDS6600::setCh1Ampl(uint32_t ampl)
 {
   espAWG::setCh1Ampl(ampl);
 
-  snprintf(command, CMD_LEN, ":w25=%lu.\r\n", ampl);
+  snprintf(command, CMD_LEN, ":w25=%u.\r\n", ampl);
   writeData();
 }
 
@@ -64,7 +64,7 @@ void espAWGJDS6600::setCh2Ampl(uint32_t ampl)
 {
   espAWG::setCh2Ampl(ampl);
 
-  snprintf(command, CMD_LEN, ":w26=%lu.\r\n", ampl);
+  snprintf(command, CMD_LEN, ":w26=%u.\r\n", ampl);
   writeData();
 }
 
@@ -73,7 +73,7 @@ void espAWGJDS6600::setCh1Phase(uint32_t phase)
 {
   espAWG::setCh1Phase(phase);
 
-  snprintf(command, CMD_LEN, ":w31=%lu.\r\n", phase / 100);
+  snprintf(command, CMD_LEN, ":w31=%u.\r\n", phase / 100);
   writeData();
 }
 
@@ -81,7 +81,7 @@ void espAWGJDS6600::setCh2Phase(uint32_t phase)
 {
   espAWG::setCh2Phase(phase);
 
-  snprintf(command, CMD_LEN, ":w31=%lu.\r\n", phase / 100);
+  snprintf(command, CMD_LEN, ":w31=%u.\r\n", phase / 100);
   writeData();
 }
 
@@ -92,7 +92,7 @@ void espAWGJDS6600::setCh1Offset(int32_t offset)
 
   espAWG::setCh1Offset(offset);
   
-  snprintf(command, CMD_LEN, ":w27=%l.\r\n", offset / 10 + 1000);
+  snprintf(command, CMD_LEN, ":w27=%d.\r\n", offset / 10 + 1000);
   writeData();
 }
 
@@ -103,6 +103,6 @@ void espAWGJDS6600::setCh2Offset(int32_t offset)
 
   espAWG::setCh2Offset(offset);
   
-  snprintf(command, CMD_LEN, ":w28=%l.\r\n", offset / 10 + 1000);
+  snprintf(command, CMD_LEN, ":w28=%d.\r\n", offset / 10 + 1000);
   writeData();
 }

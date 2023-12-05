@@ -127,7 +127,9 @@ void sendReadResponse(uint32_t xid, WiFiClient client)
   /* Note: we do not swap endianness of the data payload */
   swapEndianess((uint8_t*)response, sizeof(rcpresp_devReadWrite));
 
+#ifndef ESP32
   while(!client.availableForWrite());
+#endif
   client.write((uint8_t*)response, length);
 
   free(response);
@@ -145,7 +147,9 @@ uint8_t handlePortmap(uint8_t *packet, WiFiClient client)
     fillResponseHeader((uint8_t*)&(response.header), getport->header.xid, sizeof(rpcresp_getport));
     response.vxi_port = LXI_PORT;
     swapEndianess((uint8_t*)&response, sizeof(rpcresp_getport));
+#ifndef ESP32
     while(!client.availableForWrite());
+#endif
     client.write((uint8_t*)&response, sizeof(rpcresp_getport));
   }
   
@@ -176,7 +180,9 @@ uint8_t handleVxi11(uint8_t *packet, WiFiClient client)
     create_response.maxReceiveSize = 0x00800000;
 
     swapEndianess((uint8_t*)&create_response, sizeof(rpcresp_createLink));
+#ifndef ESP32
     while(!client.availableForWrite());
+#endif
     client.write((uint8_t*)&create_response, sizeof(rpcresp_createLink));
     return 0;
     break;
@@ -206,7 +212,9 @@ uint8_t handleVxi11(uint8_t *packet, WiFiClient client)
     write_response.dataLen = 0x00;
 
     swapEndianess((uint8_t*)&write_response, sizeof(rcpresp_devReadWrite));
+#ifndef ESP32
     while(!client.availableForWrite());
+#endif
     client.write((uint8_t*)&write_response, sizeof(rcpresp_devReadWrite));
     return 0;
     break;
@@ -222,6 +230,7 @@ uint8_t handlePacket(WiFiClient client)
   rpcreq_header *header;
   if(0 == receiveRpcPacket((uint8_t**)&header, client)) {
     /* ERROR: no packed received */
+    DEBUG("handlePacket: packet not received");
     return 1;
   }
 

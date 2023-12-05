@@ -1,11 +1,11 @@
+
 #include "esp_config.h"
 #include "esp_parser.h"
 #include "esp_network.h"
 
 typedef enum {
   ESP_WIFI,
-  ESP_RPC,
-  ESP_LXI
+  ESP_CLIENTS,
 } espState;
 
 WiFiServer  rpcServer(RPC_PORT);
@@ -42,6 +42,8 @@ void setup()
   WiFi.begin(WIFI_SSID, WIFI_PSK);
 #elif defined(WIFI_MODE_AP)
   WiFi.softAP(WIFI_SSID, WIFI_PSK);
+  DEBUG("SoftAP IP");
+  DEBUG(WiFi.softAPIP());
 #else
   #error PLEASE SELECT WIFI_MODE_AP OR WIFI_MODE_CLIENT!
 #endif
@@ -50,6 +52,7 @@ void setup()
 void loop()
 {
   //check wifi connection
+#if defined(WIFI_MODE_CLIENT)
   if(WiFi.status() != WL_CONNECTED) {
 #if defined(DEBUG_TELNET) && !defined(DEBUG_UART) && !defined(ESP32)
     telnet.stop();
@@ -58,7 +61,6 @@ void loop()
     lxiServer.stop();
     currentState = ESP_WIFI;
 
-#if defined(WIFI_MODE_CLIENT)
     if(wifiTimeout++ > 10) {
       wifiTimeout = 0;
 
@@ -66,16 +68,16 @@ void loop()
       WiFi.disconnect();
       WiFi.begin(WIFI_SSID, WIFI_PSK);
     }
-#endif
     
     delay(500);
     DEBUG(".");
     return;
   }
+#endif
 
   //new wifi connection
   if(currentState == ESP_WIFI) {
-    currentState  = ESP_RPC;
+    currentState  = ESP_CLIENTS;
     wifiTimeout   = 10;
     
     DEBUG("WiFi connected");
@@ -95,22 +97,19 @@ void loop()
   telnet.loop();
 #endif
 
-  //check for rpc client
-  if(currentState == ESP_RPC) {
+  if(currentState == ESP_CLIENTS) {
+    //check for rpc client
     WiFiClient  rpcClient;
+    rpcClient.setTimeout(1000);
     rpcClient = rpcServer.available();
     if(rpcClient) {
       DEBUG("RPC CONNECTION.");
   
       handlePacket(rpcClient);
       rpcClient.stop();
-
-      currentState = ESP_LXI;
     }
-  }
 
-  //check for lxi client
-  if(currentState == ESP_LXI) {
+    //check for lxi client
     WiFiClient  lxiClient;
     lxiClient.setTimeout(1000);
     lxiClient = lxiServer.available();
@@ -127,8 +126,6 @@ void loop()
   
       lxiClient.stop();
       DEBUG("DISCONNECTING");
-
-      currentState = ESP_RPC;
     }
   }
 }

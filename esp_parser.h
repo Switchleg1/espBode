@@ -10,10 +10,6 @@
   #include "esp_awg_fy6800.h"
   extern espAWGFY6800 awg;
 #endif
-#ifdef AWG_TYPE_FY6900
-  #include "esp_awg_fy6900.h"
-  extern espAWGFY6900 awg;
-#endif
 
 extern volatile char *gReadBuffer;
 
