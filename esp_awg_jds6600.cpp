@@ -37,18 +37,26 @@ void espAWGJDS6600::setCh2Output(uint32_t output)
 void espAWGJDS6600::setCh1Freq(uint32_t frequency)
 {
   espAWG::setCh1Freq(frequency);
-  
-  snprintf(command, CMD_LEN, ":w23=%u,0.\r\n", frequency);
-  writeData();
+
+  do {
+    snprintf(command, CMD_LEN, ":w23=%u,0.\r\n", frequency);
+    writeData();
+    snprintf(command, CMD_LEN, ":r23=0.\r\n");
+    writeData();
+  } while(strstr(command, ":r23=0,0.") == command);
 }
 
 /* Set frequency in Hz */
 void espAWGJDS6600::setCh2Freq(uint32_t frequency)
 {
   espAWG::setCh2Freq(frequency);
-  
-  snprintf(command, CMD_LEN, ":w24=%u,0.\r\n", frequency);
-  writeData();
+
+  do {
+    snprintf(command, CMD_LEN, ":w24=%u,0.\r\n", frequency);
+    writeData();
+    snprintf(command, CMD_LEN, ":r24=0.\r\n");
+    writeData();
+  } while(strstr(command, ":r24=0,0.") == command);
 }
 
 /* Ampl is in mV: 12.345V = 12345 */

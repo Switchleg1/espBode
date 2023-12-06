@@ -83,9 +83,12 @@ void espAWG::writeData()
   telnet.print(command);
 #endif
 
-  //get response
+  getResponse();
+}
+
+void espAWG::getResponse()
+{
   uint16_t  timeout = 0;
-  char      responseString[256] = {0,};
   uint8_t   responsePos = 0;
   while(timeout++ < 1000) {
 #if defined(ESP32)
@@ -96,19 +99,19 @@ void espAWG::writeData()
       char c = Serial.read();
 #endif
       if(c == '\n') {
-        responseString[responsePos++] = 0;
+        command[responsePos++] = 0;
         timeout = 0xFFFF;
         break;
       } else {
-        responseString[responsePos++] = c;
+        command[responsePos++] = c;
       }
     }
     delay(1);
   }
-  responseString[responsePos] = 0;
+  command[responsePos] = 0;
 
   //write response
-  DEBUG(responseString);
+  DEBUG(command);
 
   if(timeout != 0xFFFF) {
     DEBUG("TIMEOUT");

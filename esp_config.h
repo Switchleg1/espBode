@@ -56,7 +56,7 @@
 
 //DEBUG SETTINGS
 //#define DEBUG_UART
-//#define DEBUG_TELNET        //required ESP Telnet library
+#define DEBUG_TELNET        //required ESP Telnet library
 #if defined(DEBUG_UART) || defined(ESP32)
   #define DEBUG(TEXT)       Serial.println(TEXT);
 #elif defined(DEBUG_TELNET)

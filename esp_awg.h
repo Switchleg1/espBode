@@ -47,6 +47,7 @@ class espAWG {
 
   protected:
     void          writeData();
+    void          getResponse();
 
     SDeviceState  gDeviceState;
     char          command[CMD_LEN];
