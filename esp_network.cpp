@@ -83,7 +83,8 @@ uint32_t receiveRpcPacket(uint8_t **data, WiFiClient client)
   uint32_t        length;
 
   /* Wait till some data is available */
-  while(!client.available());
+  uint16_t timeout = 0;
+  while(!client.available() && timeout++ < 5000) delay(1);
 
   /* Read the RPC header */
   client.readBytes((uint8_t*)&header, sizeof(rpcreq_header));
@@ -99,7 +100,8 @@ uint32_t receiveRpcPacket(uint8_t **data, WiFiClient client)
     memcpy((rpcreq_header*)*data, &header, sizeof(rpcreq_header));
   
     /* Receive remaining data (length - header) */
-    while(!client.available());
+    timeout = 0;
+    while(!client.available() && timeout++ < 5000) delay(1);
     client.readBytes(*data + sizeof(rpcreq_header), length - sizeof(rpcreq_header));
     swapEndianess((uint8_t*)(*data + sizeof(rpcreq_header)), length - sizeof(rpcreq_header));
   
@@ -128,7 +130,8 @@ void sendReadResponse(uint32_t xid, WiFiClient client)
   swapEndianess((uint8_t*)response, sizeof(rcpresp_devReadWrite));
 
 #ifndef ESP32
-  while(!client.availableForWrite());
+  uint16_t timeout = 0;
+  while(!client.availableForWrite() && timeout++ < 5000) delay;
 #endif
   client.write((uint8_t*)response, length);
 
@@ -148,7 +151,8 @@ uint8_t handlePortmap(uint8_t *packet, WiFiClient client)
     response.vxi_port = LXI_PORT;
     swapEndianess((uint8_t*)&response, sizeof(rpcresp_getport));
 #ifndef ESP32
-    while(!client.availableForWrite());
+    uint16_t timeout = 0;
+    while(!client.availableForWrite() && timeout++ < 5000) delay;
 #endif
     client.write((uint8_t*)&response, sizeof(rpcresp_getport));
   }
@@ -166,6 +170,8 @@ void parseVxiWrite(uint8_t *packet)
 
 uint8_t handleVxi11(uint8_t *packet, WiFiClient client)
 {
+  uint16_t timeout = 0;
+  
   rpcreq_header *header = (rpcreq_header*)packet;
   switch(header->procedure) {
   case VXI_11_CREATE_LINK:
@@ -181,7 +187,7 @@ uint8_t handleVxi11(uint8_t *packet, WiFiClient client)
 
     swapEndianess((uint8_t*)&create_response, sizeof(rpcresp_createLink));
 #ifndef ESP32
-    while(!client.availableForWrite());
+    while(!client.availableForWrite() && timeout++ < 5000) delay;
 #endif
     client.write((uint8_t*)&create_response, sizeof(rpcresp_createLink));
     return 0;
@@ -213,7 +219,7 @@ uint8_t handleVxi11(uint8_t *packet, WiFiClient client)
 
     swapEndianess((uint8_t*)&write_response, sizeof(rcpresp_devReadWrite));
 #ifndef ESP32
-    while(!client.availableForWrite());
+    while(!client.availableForWrite() && timeout++ < 5000) delay;
 #endif
     client.write((uint8_t*)&write_response, sizeof(rcpresp_devReadWrite));
     return 0;

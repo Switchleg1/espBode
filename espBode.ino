@@ -3,16 +3,11 @@
 #include "esp_parser.h"
 #include "esp_network.h"
 
-typedef enum {
-  ESP_WIFI,
-  ESP_CLIENTS,
-} espState;
-
 WiFiServer  rpcServer(RPC_PORT);
 WiFiServer  lxiServer(LXI_PORT);
 
-espState    currentState  = ESP_WIFI;
 uint8_t     wifiTimeout   = 0;
+bool        wifiConnected = false;
 
 #if defined(DEBUG_TELNET) && !defined(DEBUG_UART) && !defined(ESP32)
   ESPTelnet telnet;
@@ -59,7 +54,7 @@ void loop()
 #endif
     rpcServer.stop();
     lxiServer.stop();
-    currentState = ESP_WIFI;
+    wifiConnected = false;
 
     if(wifiTimeout++ > 10) {
       wifiTimeout = 0;
@@ -76,9 +71,9 @@ void loop()
 #endif
 
   //new wifi connection
-  if(currentState == ESP_WIFI) {
-    currentState  = ESP_CLIENTS;
-    wifiTimeout   = 10;
+  if(!wifiConnected) {
+    wifiConnected = true;
+    wifiTimeout   = 0;
     
     DEBUG("WiFi connected");
     DEBUG("IP address: ");
@@ -97,35 +92,33 @@ void loop()
   telnet.loop();
 #endif
 
-  if(currentState == ESP_CLIENTS) {
-    //check for rpc client
-    WiFiClient  rpcClient;
-    rpcClient.setTimeout(1000);
-    rpcClient = rpcServer.available();
-    if(rpcClient) {
-      DEBUG("RPC CONNECTION.");
-  
-      handlePacket(rpcClient);
-      rpcClient.stop();
+  //check for rpc client
+  WiFiClient  rpcClient;
+  rpcClient.setTimeout(1000);
+  rpcClient = rpcServer.available();
+  if(rpcClient) {
+    DEBUG("RPC CONNECTION.");
+
+    handlePacket(rpcClient);
+    rpcClient.stop();
+  }
+
+  //check for lxi client
+  WiFiClient  lxiClient;
+  lxiClient.setTimeout(1000);
+  lxiClient = lxiServer.available();
+  if(lxiClient) {
+    DEBUG("LXI CONNECTION.");
+
+    //handle lxi connection
+    while(!handlePacket(lxiClient)) {
+#if defined(DEBUG_TELNET) && !defined(DEBUG_UART) && !defined(ESP32)
+      telnet.loop();
+#endif
+      yield();
     }
 
-    //check for lxi client
-    WiFiClient  lxiClient;
-    lxiClient.setTimeout(1000);
-    lxiClient = lxiServer.available();
-    if(lxiClient) {
-      DEBUG("LXI CONNECTION.");
-  
-      //handle lxi connection
-      while(!handlePacket(lxiClient)) {
-#if defined(DEBUG_TELNET) && !defined(DEBUG_UART) && !defined(ESP32)
-        telnet.loop();
-#endif
-        yield();
-      }
-  
-      lxiClient.stop();
-      DEBUG("DISCONNECTING");
-    }
+    lxiClient.stop();
+    DEBUG("DISCONNECTING");
   }
 }
